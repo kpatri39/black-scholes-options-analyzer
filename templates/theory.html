@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black-Scholes Theory - Options Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>The Black-Scholes Model: Theory & Implementation</h1>
+        
+        <div class="theory-nav">
+            <a href="#pde-section">The PDE</a>
+            <a href="#solution-section">Closed-Form Solution</a>
+            <a href="#assumptions-section">Model Assumptions</a>
+            <a href="#limitations-section">Limitations</a>
+        </div>
+
+        <section id="pde-section" class="theory-section">
+            <h2>The Black-Scholes Partial Differential Equation</h2>
+            
+            <p>The Black-Scholes PDE describes how an option's value $V(S,t)$ evolves over time:</p>
+            
+            <div class="equation-box">
+                $$\frac{\partial V}{\partial t} + \frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2} + rS\frac{\partial V}{\partial S} - rV = 0$$
+            </div>
+            
+            <h3>Breaking Down Each Term</h3>
+            
+            <div class="term-explanation">
+                <h4>$\frac{\partial V}{\partial t}$ - Time Decay (Theta)</h4>
+                <p>This represents how the option value changes as time passes. As expiration approaches, options lose time value - this is the mathematical representation of time decay that traders call "theta."</p>
+            </div>
+
+            <div class="term-explanation">
+                <h4>$\frac{1}{2}\sigma^2 S^2 \frac{\partial^2 V}{\partial S^2}$ - Volatility Effect (Gamma)</h4>
+                <p>This term captures how volatility affects option pricing. The $\sigma^2$ represents the variance of stock returns, while the second derivative $\frac{\partial^2 V}{\partial S^2}$ (gamma) shows how sensitive the option's delta is to stock price changes. Higher volatility increases option value because it increases the probability of finishing in-the-money.</p>
+            </div>
+
+            <div class="term-explanation">
+                <h4>$rS\frac{\partial V}{\partial S}$ - Risk-Free Growth (Delta)</h4>
+                <p>This represents the expected growth of the stock at the risk-free rate in a risk-neutral world. The $\frac{\partial V}{\partial S}$ is delta - how much the option price changes with stock price. This term accounts for the fact that we're valuing the option in a risk-neutral probability measure.</p>
+            </div>
+
+            <div class="term-explanation">
+                <h4>$-rV$ - Discounting</h4>
+                <p>This term discounts the option value at the risk-free rate. It represents the cost of capital - the return you could earn risk-free instead of holding this option.</p>
+            </div>
+        </section>
+
+        <section id="solution-section" class="theory-section">
+            <h2>From PDE to Closed-Form Solution</h2>
+            
+            <p>The Black-Scholes PDE can be solved analytically with appropriate boundary conditions:</p>
+            
+            <h3>Boundary Conditions</h3>
+            <ul>
+                <li><strong>At expiration:</strong> $V(S,T) = \max(S-K, 0)$ for calls, $V(S,T) = \max(K-S, 0)$ for puts</li>
+                <li><strong>As $S \to 0$:</strong> Call options become worthless, puts approach $Ke^{-r(T-t)}$</li>
+                <li><strong>As $S \to \infty$:</strong> Calls behave like stock, puts become worthless</li>
+            </ul>
+
+            <h3>The Closed-Form Solution</h3>
+            
+            <p>Through a series of mathematical transformations (involving a substitution that converts the PDE to the heat equation), we arrive at:</p>
+
+            <div class="equation-box">
+                <h4>Call Option:</h4>
+                $$C = S_0 N(d_1) - Ke^{-rT} N(d_2)$$
+                
+                <h4>Put Option:</h4>
+                $$P = Ke^{-rT} N(-d_2) - S_0 N(-d_1)$$
+                
+                <h4>Where:</h4>
+                $$d_1 = \frac{\ln(S_0/K) + (r + \sigma^2/2)T}{\sigma\sqrt{T}}$$
+                $$d_2 = d_1 - \sigma\sqrt{T}$$
+            </div>
+
+            <h3>Interpreting the Solution</h3>
+            <ul>
+                <li>$N(d_1)$ and $N(d_2)$ are cumulative standard normal distribution functions</li>
+                <li>$N(d_2)$ represents the risk-neutral probability the option expires in-the-money</li>
+                <li>$N(d_1)$ represents the "delta" - sensitivity to stock price changes</li>
+                <li>The solution elegantly combines expected payoffs with proper discounting</li>
+            </ul>
+        </section>
+
+        <section id="assumptions-section" class="theory-section">
+            <h2>Model Assumptions</h2>
+            
+            <p>The Black-Scholes model makes several key assumptions that affect its accuracy:</p>
+            
+            <div class="assumptions-grid">
+                <div class="assumption-item">
+                    <h3>1. Constant Volatility</h3>
+                    <p>The model assumes volatility $\sigma$ remains constant over the option's life. In reality, volatility changes based on market conditions, earnings announcements, and other events.</p>
+                </div>
+
+                <div class="assumption-item">
+                    <h3>2. Constant Risk-Free Rate</h3>
+                    <p>Interest rates are assumed constant, but they fluctuate based on monetary policy, economic conditions, and market sentiment.</p>
+                </div>
+
+                <div class="assumption-item">
+                    <h3>3. Log-Normal Stock Prices</h3>
+                    <p>Stock prices are assumed to follow geometric Brownian motion: $dS = \mu S dt + \sigma S dW$. This implies log-normal distribution of prices and continuous price movements.</p>
+                </div>
+
+                <div class="assumption-item">
+                    <h3>4. No Dividends</h3>
+                    <p>The basic model assumes no dividend payments during the option's life. Dividend-paying stocks require model adjustments.</p>
+                </div>
+
+                <div class="assumption-item">
+                    <h3>5. No Transaction Costs</h3>
+                    <p>The model assumes frictionless trading with no bid-ask spreads, commissions, or market impact costs.</p>
+                </div>
+
+                <div class="assumption-item">
+                    <h3>6. Perfect Liquidity</h3>
+                    <p>Assumes continuous trading and the ability to buy/sell any quantity at the market price instantly.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="limitations-section" class="theory-section">
+            <h2>Model Limitations & Real-World Considerations</h2>
+
+            <div class="limitation-section">
+                <h3>European vs. American Options</h3>
+                <p><strong>Critical Limitation:</strong> The Black-Scholes formula applies specifically to <em>European-style</em> options, which can only be exercised at expiration.</p>
+                
+                <div class="comparison-box">
+                    <div class="option-type">
+                        <h4>European Options</h4>
+                        <ul>
+                            <li>Exercise only at expiration</li>
+                            <li>Black-Scholes applies directly</li>
+                            <li>Common in index options (SPX, NDX)</li>
+                            <li>Closed-form solution available</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="option-type">
+                        <h4>American Options</h4>
+                        <ul>
+                            <li>Early exercise allowed anytime</li>
+                            <li>More valuable than European counterparts</li>
+                            <li>Most individual stock options</li>
+                            <li>Requires numerical methods (binomial trees, Monte Carlo)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p><strong>Our Implementation:</strong> This tool uses the European Black-Scholes formula. When analyzing American options (like most stock options), our theoretical prices represent a <em>lower bound</em> - the actual option may be worth more due to early exercise value.</p>
+            </div>
+
+            <div class="limitation-section">
+                <h3>Why Market Prices Differ from Our Model</h3>
+                
+                <div class="market-reality">
+                    <h4>Implied vs. Historical Volatility</h4>
+                    <p>Our model uses historical volatility (past price movements), but the market prices options based on <em>implied volatility</em> (expected future volatility). Market expectations often differ from historical patterns, especially around:</p>
+                    <ul>
+                        <li>Earnings announcements</li>
+                        <li>FDA approvals</li>
+                        <li>Major economic events</li>
+                        <li>Market stress periods</li>
+                    </ul>
+                </div>
+
+                <div class="market-reality">
+                    <h4>Volatility Smile</h4>
+                    <p>Real options markets exhibit a "volatility smile" - implied volatility varies by strike price and time to expiration. The Black-Scholes model assumes constant volatility across all strikes.</p>
+                </div>
+
+                <div class="market-reality">
+                    <h4>Market Microstructure</h4>
+                    <p>Bid-ask spreads, liquidity constraints, and transaction costs create pricing inefficiencies that pure mathematical models don't capture.</p>
+                </div>
+            </div>
+
+            <div class="practical-applications">
+                <h3>Practical Applications</h3>
+                <p>Despite limitations, the Black-Scholes model remains fundamental to options trading because it:</p>
+                <ul>
+                    <li>Provides a theoretical baseline for option values</li>
+                    <li>Enables calculation of risk sensitivities (Greeks)</li>
+                    <li>Forms the foundation for more sophisticated models</li>
+                    <li>Helps identify potentially mispriced options</li>
+                </ul>
+                
+                <div class="insight-box">
+                    <h4>Trading Insight</h4>
+                    <p>Professional traders use Black-Scholes not as absolute truth, but as a starting point. They adjust for dividends, early exercise premiums, volatility surfaces, and market conditions to make informed trading decisions.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="nav-buttons">
+            <a href="/" class="back-button">Option Analyzer</a>
+            <a href="/3d-visualization" class="back-button">3D Visualization</a>
+        </div>
+    </div>
+</body>
+</html>

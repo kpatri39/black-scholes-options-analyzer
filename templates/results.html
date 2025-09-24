@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Black-Scholes Options Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Option Analysis Results</h1>
+        
+        <div class="results-section">
+            <h2>{{ result['ticker'] }} - {{ result['option_type']|title }} Option</h2>
+            
+            <div class="pricing-info">
+                <h3>Pricing Analysis</h3>
+                <p><strong>Current Stock Price:</strong> ${{ "%.2f"|format(result['stock_price']) }}</p>
+                <p><strong>Market Price:</strong> ${{ "%.2f"|format(result['market_price']) }}</p>
+                <p><strong>Theoretical Price:</strong> ${{ "%.2f"|format(result['theoretical_price']) }}</p>
+                <p><strong>Difference:</strong> ${{ "%.2f"|format(result['difference']) }} ({{ "%.1f"|format(result['percentage_diff']) }}%)</p>
+            </div>
+            
+            <div class="greeks-info">
+                <h3>Greeks Analysis</h3>
+                <p><strong>Delta:</strong> {{ "%.4f"|format(result['greeks']['delta']) }}</p>
+                <p><strong>Gamma:</strong> {{ "%.4f"|format(result['greeks']['gamma']) }}</p>
+                <p><strong>Theta:</strong> ${{ "%.2f"|format(result['greeks']['theta']) }} per year (${{ "%.2f"|format(result['greeks']['theta']/365) }} per day)</p>
+                <p><strong>Vega:</strong> ${{ "%.4f"|format(result['greeks']['vega']) }}</p>
+                <p><strong>Rho:</strong> ${{ "%.4f"|format(result['greeks']['rho']) }}</p>
+            </div>
+        </div>
+        
+        <a href="/" class="back-button">Analyze Another Option</a>
+    </div>
+</body>
+</html>
