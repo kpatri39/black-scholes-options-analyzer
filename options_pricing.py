@@ -3,7 +3,6 @@
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import yfinance as yf
 from scipy.stats import norm
 import math
