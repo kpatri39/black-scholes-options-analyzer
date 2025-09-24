@@ -26,7 +26,7 @@ Implements the complete Black-Scholes partial differential equation: ∂V/∂t +
 
 ## Local Development
 ```bash
-git clone https://github.com/yourusername/black-scholes-options-analyzer
+git clone https://github.com/kpatri39/black-scholes-options-analyzer
 cd black-scholes-options-analyzer
 pip install -r requirements.txt
 python options_app.py
