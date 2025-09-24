@@ -2,7 +2,7 @@
 
 Interactive web application for options pricing analysis using the Black-Scholes model with 3D visualization and real-time market data comparison.
 
-## 🌐 Live Demo
+## Live Demo
 [Try it here: https://black-scholes-options-analyzer.onrender.com/]
 
 ## Features
