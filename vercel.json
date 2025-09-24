@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "./options_app.py",
+      "src": "options_app.py",
       "use": "@vercel/python"
     }
   ],
@@ -11,5 +11,10 @@
       "src": "/(.*)",
       "dest": "options_app.py"
     }
-  ]
+  ],
+  "functions": {
+    "options_app.py": {
+      "maxDuration": 10
+    }
+  }
 }
